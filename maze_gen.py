@@ -209,9 +209,9 @@ class Bracktrack_Maze:
         for i in range(5):
             if i == 1:
                 pattern_cells.add((top_cells + i) * w +  left_cells + 2)
-            elif i == 3 :
+            elif i == 3:
                 pattern_cells.add((top_cells + i) * w + left_cells)
-            else:
+            else :
                 pattern_cells.add((top_cells + i) * w + left_cells)
                 pattern_cells.add((top_cells + i) * w + left_cells + 1)
                 pattern_cells.add((top_cells + i) * w + left_cells + 2)
@@ -226,9 +226,15 @@ class Bracktrack_Maze:
             for x in range(w):
                 index = y * w + x
                 if x < w - 1:
-                    walls.append((index, index + 1))
+                    if index in pattern_cells or index + 1 in pattern_cells:
+                        pattern_walls.append((index, index + 1))
+                    else:
+                        walls.append((index, index + 1))
                 if y < h - 1:
-                    walls.append((index, index + w))
+                    if index in pattern_cells or index + w in pattern_cells:
+                        pattern_walls.append((index, index + w))
+                    else:
+                        walls.append((index, index + w)) 
 
     def get_unvisited_neighbors(self, cur: int, visited: set):
         h = self.height
@@ -269,7 +275,8 @@ class Bracktrack_Maze:
                     self.add_to_walls_to_remove(cur, cell, direction)
                     visited.add(cell)
                     helper(cell, visited)
-        visited = {0}
+        visited = set()
+        visited.add(self.entry[0] * self.width + self.entry[1])
         for cell in self.pattern_cells:
             visited.add(cell)
         helper(0, visited)
@@ -284,13 +291,14 @@ class Bracktrack_Maze:
                     self.add_to_walls_to_remove(cur, cell, direction)
                     visited.add(cell)
                     helper(cell, visited)
-        visited = {0}
+        visited = set()
+        visited.add(self.entry[0] * self.width + self.entry[1])
         for cell in self.pattern_cells:
             visited.add(cell)
         helper(0, visited)
         for wall in self.walls:
             if wall not in self.walls_to_remove and self._rng.random() < 0.05:
-                self.walls_to_remove.add(wall)
+                    self.walls_to_remove.add(wall)
         self.fill_matrix_cells()
 
     def fill_matrix_cells(self):
@@ -304,7 +312,7 @@ class Bracktrack_Maze:
         for row in mat:
             row[0][3] = 1
             row[w - 1][1] = 1
-        walls = self.walls
+        walls = self.walls + self.pattern_walls
         for wall in walls:
             if wall not in self.walls_to_remove:
                 x1 = wall[0] % w
@@ -335,8 +343,9 @@ class Bracktrack_Maze:
             print("Error while openning the file: ", e)
 
 if __name__ == "__main__":
-    Maze = Bracktrack_Maze(50, 50, output_filename = "maze.txt")
+    Maze = Bracktrack_Maze(5, 7, entry = (0, 1), output_filename = "maze.txt")
     Maze.generate_regular()
     Maze.output_file()
     # Maze.generate_regular()
     # Maze.out_put_file()
+
