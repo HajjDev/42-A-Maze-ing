@@ -1,4 +1,6 @@
 import random
+import heapq
+from typing import List
 from enum import Enum
 
 class DSU:
@@ -25,24 +27,27 @@ class DSU:
             return True
         return False
 
+
 class Kruskal_Maze:
-    def __init__(self, height, width, entry = (0, 0), exit = (0, 0), seed = 42, output_filename = "maze.txt", cell_size = 42):
+    def __init__(self, height, width, seed = 42, cell_size = 42, entry_point = (0, 0), exit_point = (0, 0), output_filename = "maze.txt"):
         self.height = height
         self.width = width
-        self.entry = entry
-        self.exit = exit
-        self.output_filename = output_filename
         self.cell_size = cell_size
+        self.entry_point = entry_point
+        self.exit_point = exit_point
+        self.output_filename = output_filename
         self._rng = random.Random(seed)
-        self.matrix_cells = None
         self.walls = []
         self.maze_walls = []
         self.pattern_walls = []
         self.pattern_cells = set()
+        self.matrix_cells = None
+        self.shortest_path = None
         self.set_four_cells()
         self.set_two_cells()
         self.fill_walls()
-    
+
+
     def set_four_cells(self):
         w = self.width
         h = self.height
@@ -58,6 +63,7 @@ class Kruskal_Maze:
                 pattern_cells.add((top_cells + i) * w + left_cells + 2)
             else:
                 pattern_cells.add((top_cells + i) * w + left_cells)
+
 
     def set_two_cells(self):
         w = self.width
@@ -94,36 +100,8 @@ class Kruskal_Maze:
                     if index in pattern_cells or index + w in pattern_cells:
                         pattern_walls.append((index, index + w))
                     else:
-                        walls.append((index, index + w))   
+                        walls.append((index, index + w))
 
-    def generate_perfect(self):
-        self._rng.shuffle(self.walls)
-        dsu = DSU(self.height * self.width)
-        maze_walls = self.maze_walls
-        maze_walls.clear()
-        for wall in self.walls:
-            cell1, cell2 = wall
-            if dsu.find(cell1) != dsu.find(cell2):
-                dsu.union(cell1, cell2)
-            else:
-                maze_walls.append(wall)
-        self.fill_matrix_cells()
-
-    def generate_regular(self):
-        self._rng.shuffle(self.walls)
-        dsu = DSU(self.height * self.width)
-        maze_walls = self.maze_walls
-        maze_walls.clear()
-        for wall in self.walls:
-            cell1, cell2 = wall
-            if dsu.find(cell1) != dsu.find(cell2):
-                dsu.union(cell1, cell2)
-            else :
-                if self._rng.random() < 0.05:
-                    pass
-                else :
-                    maze_walls.append(wall)
-        self.fill_matrix_cells()
 
     def fill_matrix_cells(self):
         h = self.height
@@ -149,40 +127,142 @@ class Kruskal_Maze:
                 mat[y1][x1][2] = 1
                 mat[y2][x2][0] = 1
 
-    def output_file(self):
+
+    def generate_perfect(self):
+        self._rng.shuffle(self.walls)
+        dsu = DSU(self.height * self.width)
+        maze_walls = self.maze_walls
+        maze_walls.clear()
+        for wall in self.walls:
+            cell1, cell2 = wall
+            if dsu.find(cell1) != dsu.find(cell2):
+                dsu.union(cell1, cell2)
+            else:
+                maze_walls.append(wall)
+        self.fill_matrix_cells()
+
+
+    def generate_regular(self):
+        self._rng.shuffle(self.walls)
+        dsu = DSU(self.height * self.width)
+        maze_walls = self.maze_walls
+        maze_walls.clear()
+        for wall in self.walls:
+            cell1, cell2 = wall
+            if dsu.find(cell1) != dsu.find(cell2):
+                dsu.union(cell1, cell2)
+            else :
+                if self._rng.random() < 0.05:
+                    pass
+                else :
+                    maze_walls.append(wall)
+        self.fill_matrix_cells()
+
+
+    def solve_maze(self) -> None:
         if self.matrix_cells is None:
             return
+        matrix_cells = self.matrix_cells
+        width = self.width
+        height = self.height
+        start = self.entry_point[1] * width + self.entry_point[0]
+        end = self.exit_point[1] * width + self.exit_point[0]
+        def get_available_neighbor(node: int) -> List[int]:
+            j = node // width
+            i = node % width
+            neighbor = []
+            if matrix_cells[j][i][0] == 0:
+                neighbor.append(width * (j - 1) + i)
+            if matrix_cells[j][i][1] == 0:
+                neighbor.append(width * j + i + 1)
+            if matrix_cells[j][i][2] == 0:
+                neighbor.append(width * (j + 1) + i)
+            if matrix_cells[j][i][3] == 0:
+                neighbor.append(width * j + i - 1)
+            return neighbor
+
+
+        def dijkstra() -> List[int]:
+            distance = [float('inf')] * (width * height)
+            distance[start] = 0
+            parent = {start:None}
+            pq = [(0, start)]
+            while pq:
+                cur_dist, cur_ver = heapq.heappop(pq)
+                if cur_ver == end:
+                    path = []
+                    while cur_ver is not None:
+                        path.append(cur_ver)
+                        cur_ver = parent[cur_ver]
+                    return path[::-1]
+                if cur_dist != distance[cur_ver]:
+                    continue
+                neighbor_list = get_available_neighbor(cur_ver)
+                for neighbor in neighbor_list:
+                    dist = cur_dist + 1
+                    if dist < distance[neighbor]:
+                        parent[neighbor] = cur_ver
+                        distance[neighbor] = dist
+                        heapq.heappush(pq, (dist, neighbor))
+            return None
+
+
+        self.shortest_path = dijkstra()
+
+
+    def output_file(self):
+        if self.matrix_cells is None or self.shortest_path is None:
+            return
         mat = self.matrix_cells
+        shortest_path = self.shortest_path
         try:
             with open(self.output_filename, "w") as file:
                 for y in range(self.height):
                     hex_seq = ""
                     for x in range(self.width) :
-                        val = mat[y][x][0] * 8 + mat[y][x][1] * 4 + mat[y][x][2] * 2 + mat[y][x][3]
+                        val = mat[y][x][0] + mat[y][x][1] * 2 + mat[y][x][2] * 4 + mat[y][x][3] * 8
                         hex_seq += f"{val:X}"
                     hex_seq+="\n"
                     file.write(hex_seq)
+                file.write("\n")
+                file.write(f"{self.entry_point[0]},{self.entry_point[1]}\n")
+                file.write(f"{self.exit_point[0]},{self.exit_point[1]}\n")
+                direction = ""
+                for i in range(len(shortest_path) - 1):
+                    if shortest_path[i + 1] - shortest_path[i] == self.width:
+                        direction += "S"
+                    if shortest_path[i + 1] - shortest_path[i] == -self.width:
+                        direction += "N"
+                    if shortest_path[i + 1] - shortest_path[i] == 1:
+                        direction += "E"
+                    if shortest_path[i + 1] - shortest_path[i] == -1:
+                        direction += "W"
+                direction += "\n"
+                file.write(direction)
         except Exception as e:
             print("Something went wrong: ", e)
 
+
 Dir = Enum('Direction', [('UP', 1), ('DOWN', 2), ('RIGHT', 3), ('LEFT', 4)])
-class Bracktrack_Maze:
-    def __init__(self, height, width, entry=(0, 0), exit=(0, 0), output_filename="maze.txt", seed = 42, cell_size = 42):
+class DFS_Maze:
+    def __init__(self, height, width, seed = 42, cell_size = 42, entry_point=(0, 0), exit_point=(0, 0), output_filename="maze.txt"):
         self.height = height
         self.width = width
-        self.entry = entry
-        self.exit = exit
-        self.output_filename = output_filename
         self.cell_size = cell_size
+        self.entry_point = entry_point
+        self.exit_point = exit_point
+        self.output_filename = output_filename
+        self._rng = random.Random(seed)
         self.walls = []
-        self.matrix_cells = None
         self.pattern_walls = []
         self.pattern_cells = set()
         self.walls_to_remove = set()
+        self.matrix_cells = None
+        self.shortest_path = None
         self.set_four_cells()
         self.set_two_cells()
         self.fill_walls()
-        self._rng = random.Random(seed)
+
 
     def set_four_cells(self):
         w = self.width
@@ -200,6 +280,7 @@ class Bracktrack_Maze:
             else:
                 pattern_cells.add((top_cells + i) * w + left_cells)
 
+
     def set_two_cells(self):
         w = self.width
         h = self.height
@@ -215,6 +296,7 @@ class Bracktrack_Maze:
                 pattern_cells.add((top_cells + i) * w + left_cells)
                 pattern_cells.add((top_cells + i) * w + left_cells + 1)
                 pattern_cells.add((top_cells + i) * w + left_cells + 2)
+
 
     def fill_walls(self):
         w = self.width
@@ -236,6 +318,7 @@ class Bracktrack_Maze:
                     else:
                         walls.append((index, index + w)) 
 
+
     def get_unvisited_neighbors(self, cur: int, visited: set):
         h = self.height
         w = self.width
@@ -256,6 +339,7 @@ class Bracktrack_Maze:
             to_visit.append((right, Dir.RIGHT))
         return to_visit
 
+
     def add_to_walls_to_remove(self, cur, cell, direction):
         if direction == Dir.UP:
             self.walls_to_remove.add((cell, cur))
@@ -266,6 +350,7 @@ class Bracktrack_Maze:
         if direction == Dir.RIGHT:
             self.walls_to_remove.add((cur, cell))
 
+
     def generate_perfect(self):
         def helper(cur: int, visited: set):
             neighbors = self.get_unvisited_neighbors(cur, visited)
@@ -275,12 +360,13 @@ class Bracktrack_Maze:
                     self.add_to_walls_to_remove(cur, cell, direction)
                     visited.add(cell)
                     helper(cell, visited)
+        start = self.entry_point[1] * self.width + self.entry_point[0]
         visited = set()
-        visited.add(self.entry[0] * self.width + self.entry[1])
         for cell in self.pattern_cells:
             visited.add(cell)
-        helper(0, visited)
+        helper(start, visited)
         self.fill_matrix_cells()
+
 
     def generate_regular(self):
         def helper(cur: int, visited: set):
@@ -291,15 +377,16 @@ class Bracktrack_Maze:
                     self.add_to_walls_to_remove(cur, cell, direction)
                     visited.add(cell)
                     helper(cell, visited)
+        start = self.entry_point[1] * self.width + self.entry_point[0]
         visited = set()
-        visited.add(self.entry[0] * self.width + self.entry[1])
         for cell in self.pattern_cells:
             visited.add(cell)
-        helper(0, visited)
+        helper(start, visited)
         for wall in self.walls:
             if wall not in self.walls_to_remove and self._rng.random() < 0.05:
                     self.walls_to_remove.add(wall)
         self.fill_matrix_cells()
+
 
     def fill_matrix_cells(self):
         h = self.height
@@ -325,26 +412,102 @@ class Bracktrack_Maze:
                 elif wall[1] - wall[0] == w:
                     mat[y1][x1][2] = 1
                     mat[y2][x2][0] = 1
-    
-    def output_file(self):
+
+
+    def solve_maze(self) -> None:
         if self.matrix_cells is None:
             return
+        matrix_cells = self.matrix_cells
+        width = self.width
+        height = self.height
+        start = self.entry_point[1] * width + self.entry_point[0]
+        end = self.exit_point[1] * width + self.exit_point[0]
+        def get_available_neighbor(node: int) -> List[int]:
+            j = node // width
+            i = node % width
+            neighbor = []
+            if matrix_cells[j][i][0] == 0:
+                neighbor.append(width * (j - 1) + i)
+            if matrix_cells[j][i][1] == 0:
+                neighbor.append(width * j + i + 1)
+            if matrix_cells[j][i][2] == 0:
+                neighbor.append(width * (j + 1) + i)
+            if matrix_cells[j][i][3] == 0:
+                neighbor.append(width * j + i - 1)
+            return neighbor
+
+
+        def dijkstra() -> List[int]:
+            distance = [float('inf')] * (width * height)
+            distance[start] = 0
+            parent = {start:None}
+            pq = [(0, start)]
+            while pq:
+                cur_dist, cur_ver = heapq.heappop(pq)
+                if cur_ver == end:
+                    path = []
+                    while cur_ver is not None:
+                        path.append(cur_ver)
+                        cur_ver = parent[cur_ver]
+                    return path[::-1]
+                if cur_dist != distance[cur_ver]:
+                    continue
+                neighbor_list = get_available_neighbor(cur_ver)
+                for neighbor in neighbor_list:
+                    dist = cur_dist + 1
+                    if dist < distance[neighbor]:
+                        parent[neighbor] = cur_ver
+                        distance[neighbor] = dist
+                        heapq.heappush(pq, (dist, neighbor))
+            return None
+
+
+        self.shortest_path = dijkstra()
+        if self.shortest_path is None:
+            print(self.matrix_cells)
+
+
+    def output_file(self):
+        if self.matrix_cells is None or self.shortest_path is None:
+            return
         mat = self.matrix_cells
+        shortest_path = self.shortest_path
         try:
             with open(self.output_filename, "w") as file:
                 for y in range(self.height):
                     hex_seq = ""
                     for x in range(self.width) :
-                        val = mat[y][x][0] * 8 + mat[y][x][1] * 4 + mat[y][x][2] * 2 + mat[y][x][3]
+                        val = mat[y][x][0] + mat[y][x][1] * 2 + mat[y][x][2] * 4 + mat[y][x][3] * 8
+                        # if val  == 15:
+                        #     hex_seq += " "
+                        # else:
+                        #     hex_seq += f"{val:X}"
                         hex_seq += f"{val:X}"
-                    hex_seq += "\n"
+                    hex_seq+="\n"
                     file.write(hex_seq)
+                file.write("\n")
+                file.write(f"{self.entry_point[0]},{self.entry_point[1]}\n")
+                file.write(f"{self.exit_point[0]},{self.exit_point[1]}\n")
+                direction = ""
+                for i in range(len(shortest_path) - 1):
+                    if shortest_path[i + 1] - shortest_path[i] == self.width:
+                        direction += "S"
+                    if shortest_path[i + 1] - shortest_path[i] == -self.width:
+                        direction += "N"
+                    if shortest_path[i + 1] - shortest_path[i] == 1:
+                        direction += "E"
+                    if shortest_path[i + 1] - shortest_path[i] == -1:
+                        direction += "W"
+                direction += "\n"
+                file.write(direction)
         except Exception as e:
-            print("Error while openning the file: ", e)
+            print("Something went wrong: ", e)
+
 
 if __name__ == "__main__":
-    Maze = Bracktrack_Maze(5, 7, entry = (0, 1), output_filename = "maze.txt")
-    Maze.generate_regular()
+    Maze = DFS_Maze(42, 42, entry_point =(0, 1), exit_point=(9, 9), output_filename = "maze.txt")
+    Maze.generate_perfect()
+    Maze.solve_maze()
     Maze.output_file()
     # Maze.generate_regular()
     # Maze.out_put_file()
