@@ -167,6 +167,8 @@ class Kruskal_Maze:
         height = self.height
         start = self.entry_point[1] * width + self.entry_point[0]
         end = self.exit_point[1] * width + self.exit_point[0]
+
+
         def get_available_neighbor(node: int) -> List[int]:
             j = node // width
             i = node % width
@@ -463,8 +465,6 @@ class DFS_Maze:
 
 
         self.shortest_path = dijkstra()
-        if self.shortest_path is None:
-            print(self.matrix_cells)
 
 
     def output_file(self):
