@@ -71,11 +71,12 @@ class MazeDisplay:
             self.is_drawn = True
 
     def close_window(self, *args):
+        self.mlx_wrap.mlx_loop_exit(self.mlx_ptr)
         self.mlx_wrap.mlx_destroy_image(self.mlx_ptr, self.img_ptr)
         self.mlx_wrap.mlx_destroy_window(self.mlx_ptr, self.win_ptr)
         print("\n[+] Exited successfully.")
         sys.exit(0)
-    
+
     def draw_ui_text(self):
         y_text = 35 
         c_text = 0xCCCCCC 
@@ -154,13 +155,13 @@ class MazeDisplay:
         self.mlx_wrap.mlx_loop(self.mlx_ptr)
 
 if __name__ == "__main__":
-    from maze_gen import DFS_Maze
-    sys.setrecursionlimit(2500)
+    from maze_gen import Kruskal_Maze
+    sys.setrecursionlimit(30000)
     
-    maze_size = 20
-    maze = DFS_Maze(maze_size, maze_size, entry_point=(0, 1), exit_point=(maze_size-1, maze_size-1))
+    maze_size = 100
+    maze = Kruskal_Maze(maze_size, maze_size, entry_point=(0, 1), exit_point=(maze_size-1, maze_size-1))
     
-    maze.generate_perfect()
+    maze.generate_regular()
     maze.solve_maze()
 
     ui = MazeDisplay(maze)
