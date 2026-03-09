@@ -368,6 +368,7 @@ class DFS_Maze:
             visited.add(cell)
         helper(start, visited)
         self.fill_matrix_cells()
+        self.walls_to_remove.clear()
 
 
     def generate_regular(self):
@@ -388,6 +389,7 @@ class DFS_Maze:
             if wall not in self.walls_to_remove and self._rng.random() < 0.05:
                     self.walls_to_remove.add(wall)
         self.fill_matrix_cells()
+        self.walls_to_remove.clear()
 
 
     def fill_matrix_cells(self):
