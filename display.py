@@ -1,5 +1,7 @@
 import sys
+import time
 from mlx import Mlx
+
 
 class MazeDisplay:
     def __init__(self, maze_instance):
@@ -42,7 +44,10 @@ class MazeDisplay:
         self.c_entry = 0x10B981   
         self.c_exit = 0xEF4444    
         self.c_42 = 0x8B5CF6      
-        self.c_ui_bg = 0x0F0F0F   
+        self.c_ui_bg = 0x0F0F0F
+
+        self.last_key_time = 0.0
+        self.key_cooldown = 0.3 
         
         self.is_drawn = False
 
@@ -136,6 +141,11 @@ class MazeDisplay:
         self.draw_ui_text()
 
     def key_press(self, keycode, *args):
+        current_time = time.time()
+        if current_time - self.last_key_time < self.key_cooldown:
+            return
+        
+        self.last_key_time = current_time
         if keycode in [53, 65307]:
             self.close_window()
         elif keycode in [15, 114]:
@@ -158,7 +168,7 @@ if __name__ == "__main__":
     from maze_gen import Kruskal_Maze
     sys.setrecursionlimit(30000)
     
-    maze_size = 100
+    maze_size = 20
     maze = Kruskal_Maze(maze_size, maze_size, entry_point=(0, 1), exit_point=(maze_size-1, maze_size-1))
     
     maze.generate_regular()
