@@ -1,5 +1,17 @@
+# ************************************************************************* #
+#                                                                           #
+#                                                      :::      ::::::::    #
+#  display.py                                        :+:      :+:    :+:    #
+#                                                  +:+ +:+         +:+      #
+#  By: cel-hajj <cel-hajj@student.s19.be>        +#+  +:+       +#+         #
+#                                              +#+#+#+#+#+   +#+            #
+#  Created: 2026/03/10 23:49:26 by cel-hajj        #+#    #+#               #
+#  Updated: 2026/03/10 23:49:34 by cel-hajj        ###   ########.fr        #
+#                                                                           #
+# ************************************************************************* #
+
 """
-TODO
+Handles the graphical display and user interaction for the Maze Generator.
 """
 import sys
 import time
@@ -9,11 +21,20 @@ from maze_generator import MazeGenerator
 
 class MazeDisplay:
     """
-    TODO
+    A graphical interface class for rendering a maze and handling user
+    interactions.
     """
     def __init__(self, maze_instance: MazeGenerator) -> None:
         """
-        TODO
+        Initializes the MLX display and sets up window dimensions, image
+        buffer, and UI.
+
+        Args:
+            maze_instance (MazeGenerator): The generated maze object
+            containing grid data.
+
+        Returns:
+            None: This constructor does not return a value.
         """
         self.maze = maze_instance
         self.width = self.maze.width
@@ -93,7 +114,15 @@ class MazeDisplay:
 
     def fast_put_pixel(self, x: int, y: int, color: int) -> None:
         """
-        TODO
+        Modifies the raw image data buffer to color a specific pixel safely.
+
+        Args:
+            x (int): The x-coordinate of the pixel.
+            y (int): The y-coordinate of the pixel.
+            color (int): The hexadecimal color value.
+
+        Returns:
+            None: This method does not return a value.
         """
         if 0 <= x < self.win_w and 0 <= y < self.win_h:
             index = (y * self.size_line) + (x * self.bytes_per_pixel)
@@ -106,7 +135,18 @@ class MazeDisplay:
     def draw_rect(self, start_x: int, start_y: int, w: int,
                   h: int, color: int) -> None:
         """
-        TODO
+        Draws a filled rectangle on the image buffer using byte-level
+        manipulation.
+
+        Args:
+            start_x (int): The starting x-coordinate (top-left).
+            start_y (int): The starting y-coordinate (top-left).
+            w (int): The width of the rectangle in pixels.
+            h (int): The height of the rectangle in pixels.
+            color (int): The hexadecimal color value.
+
+        Returns:
+            None: This method does not return a value.
         """
         b = bytes([color & 0xFF,
                    (color >> 8) & 0xFF,
@@ -119,7 +159,11 @@ class MazeDisplay:
 
     def setup_hooks(self) -> None:
         """
-        TODO
+        Registers the MLX event hooks for keyboard input and window
+        interactions.
+
+        Returns:
+            None: This method does not return a value.
         """
         self.mlx_wrap.mlx_hook(self.win_ptr, 17, 0, self.close_window, self)
         self.mlx_wrap.mlx_hook(self.win_ptr, 2, 1, self.key_press, self)
@@ -127,7 +171,10 @@ class MazeDisplay:
 
     def expose_event(self) -> None:
         """
-        TODO
+        Handles the window expose event to ensure the maze renders correctly.
+
+        Returns:
+            None: This method does not return a value.
         """
         if not self.is_drawn:
             self.render_maze()
@@ -135,7 +182,11 @@ class MazeDisplay:
 
     def close_window(self) -> None:
         """
-        TODO
+        Terminates the MLX loop, destroys memory pointers, and exits the
+        program.
+
+        Returns:
+            None: This method does not return a value.
         """
         self.mlx_wrap.mlx_loop_exit(self.mlx_ptr)
         self.mlx_wrap.mlx_destroy_image(self.mlx_ptr, self.img_ptr)
@@ -144,7 +195,11 @@ class MazeDisplay:
 
     def draw_ui_text(self) -> None:
         """
-        TODO
+        Renders the user interface instructions and active theme name onto the
+        header.
+
+        Returns:
+            None: This method does not return a value.
         """
         y_text = 35
         c_text = 0xCCCCCC
@@ -167,7 +222,11 @@ class MazeDisplay:
 
     def render_maze(self) -> None:
         """
-        TODO
+        Redraws the entire maze environment including background, walls, and
+        path.
+
+        Returns:
+            None: This method does not return a value.
         """
         c_wall, c_bg, c_path = self.themes[self.theme_idx]
 
@@ -226,7 +285,14 @@ class MazeDisplay:
 
     def key_press(self, keycode: int) -> None:
         """
-        TODO
+        Handles keyboard inputs to trigger interface actions with an anti-spam
+        cooldown.
+
+        Args:
+            keycode (int): The integer code corresponding to the pressed key.
+
+        Returns:
+            None: This method does not return a value.
         """
         current_time = time.time()
         if current_time - self.last_key_time < self.key_cooldown:
@@ -247,7 +313,10 @@ class MazeDisplay:
 
     def run(self) -> None:
         """
-        TODO
+        Initializes event hooks and launches the main MLX event loop.
+
+        Returns:
+            None: This method does not return a value.
         """
         self.setup_hooks()
         self.mlx_wrap.mlx_loop(self.mlx_ptr)

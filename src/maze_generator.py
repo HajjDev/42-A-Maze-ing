@@ -1,5 +1,19 @@
+# ************************************************************************* #
+#                                                                           #
+#                                                      :::      ::::::::    #
+#  maze_generator.py                                 :+:      :+:    :+:    #
+#                                                  +:+ +:+         +:+      #
+#  By: cel-hajj <cel-hajj@student.s19.be>        +#+  +:+       +#+         #
+#                                              +#+#+#+#+#+   +#+            #
+#  Created: 2026/03/10 23:49:39 by cel-hajj        #+#    #+#               #
+#  Updated: 2026/03/10 23:49:42 by cel-hajj        ###   ########.fr        #
+#                                                                           #
+# ************************************************************************* #
+
 """
-TODO
+Module for generating, solving, and exporting procedural mazes.
+It supports both Kruskal's and Depth-First Search (DFS) algorithms,
+handling both perfect and regular maze topologies.
 """
 import random
 import heapq
@@ -9,7 +23,8 @@ from enum import Enum
 
 class MazeGenerator:
     """
-    TODO
+    Main class responsible for holding the maze grid state, applying generation
+    algorithms, calculating the shortest path, and exporting the results.
     """
     Direction = Enum(
         'Direction',
@@ -18,18 +33,32 @@ class MazeGenerator:
 
     class DSU:
         """
-        TODO
+        Disjoint Set Union (Union-Find) data structure used primarily
+        to track connected components in Kruskal's algorithm.
         """
         def __init__(self, n: int) -> None:
             """
-            TODO
+            Initializes the DSU structure with `n` isolated elements.
+
+            Args:
+                n (int): The total number of elements (cells in the maze).
+
+            Returns:
+                None
             """
             self.parent = [i for i in range(n)]
             self.rank = [1 for i in range(n)]
 
         def find(self, child: int) -> int:
             """
-            TODO
+            Finds the root parent of a given element, applying path
+            compression.
+
+            Args:
+                child (int): The index of the element to find.
+
+            Returns:
+                int: The root parent index of the element.
             """
             if self.parent[child] != child:
                 self.parent[child] = self.find(self.parent[child])
@@ -37,7 +66,15 @@ class MazeGenerator:
 
         def union(self, i: int, j: int) -> bool:
             """
-            TODO
+            Unites the sets containing elements i and j using union by rank.
+
+            Args:
+                i (int): The first element to unite.
+                j (int): The second element to unite.
+
+            Returns:
+                bool: True if a union was performed, False if they were
+                already in the same set.
             """
             root_1 = self.find(i)
             root_2 = self.find(j)
@@ -55,6 +92,30 @@ class MazeGenerator:
     def __init__(self, width: int, height: int, seed: int, cell_size: int,
                  entry_point: Tuple[int, int], exit_point: Tuple[int, int],
                  algorithm: str, maze_type: str, output_filename: str) -> None:
+        """
+        Initializes the MazeGenerator with configuration parameters and sets
+        up initial grid states.
+
+        Args:
+            width (int): The width of the maze in cells.
+            height (int): The height of the maze in cells.
+            seed (int): The seed for the random number generator.
+            cell_size (int): The visual size of the cell
+            (used by the renderer).
+            entry_point (Tuple[int, int]): The (x, y) coordinates for the maze
+            entrance.
+            exit_point (Tuple[int, int]): The (x, y) coordinates for the maze
+            exit.
+            algorithm (str): The algorithm to use
+            ('Kruskal' or 'Backtracking').
+            maze_type (str): The type of maze to generate
+            ('perfect' or 'regular').
+            output_filename (str): The name of the file to save the final maze
+            representation.
+
+        Returns:
+            None
+        """
         self.width = width
         self.height = height
         self.cell_size = cell_size
@@ -77,7 +138,14 @@ class MazeGenerator:
 
     def set_four_cells(self) -> None:
         """
-        TODO
+        Calculates and stores the cell indices corresponding to the '4'
+        in the mandatory '42' pattern integrated into the maze.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         w = self.width
         h = self.height
@@ -96,7 +164,14 @@ class MazeGenerator:
 
     def set_two_cells(self) -> None:
         """
-        TODO
+        Calculates and stores the cell indices corresponding to the '2'
+        in the mandatory '42' pattern integrated into the maze.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         w = self.width
         h = self.height
@@ -115,7 +190,14 @@ class MazeGenerator:
 
     def fill_walls(self) -> None:
         """
-        TODO
+        Populates the initial wall grid, linking adjacent cells and isolating
+        the '42' pattern walls from standard maze generation walls.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         w = self.width
         h = self.height
@@ -138,7 +220,15 @@ class MazeGenerator:
 
     def kruskal_fill_matrix_cells(self) -> None:
         """
-        TODO
+        Converts the retained walls from Kruskal's algorithm into a 3D matrix
+        representing the bounding boxes (Top, Right, Bottom, Left) of each
+        cell.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         h = self.height
         w = self.width
@@ -166,7 +256,15 @@ class MazeGenerator:
 
     def dfs_fill_matrix_cells(self) -> None:
         """
-        TODO
+        Converts the remaining walls from the DFS algorithm into a 3D matrix
+        representing the bounding boxes (Top, Right, Bottom, Left) of each
+        cell.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         h = self.height
         w = self.width
@@ -195,7 +293,15 @@ class MazeGenerator:
 
     def get_unvisited_neighbors(self, cur: int) -> List[Tuple[int, Any]]:
         """
-        TODO
+        Retrieves valid grid neighbors for a cell that are within maze
+        boundaries.
+
+        Args:
+            cur (int): The 1D index of the current cell.
+
+        Returns:
+            List[Tuple[int, Any]]: A list of tuples containing the neighbor's
+                                   1D index and relative Direction.
         """
         h = self.height
         w = self.width
@@ -219,7 +325,15 @@ class MazeGenerator:
     def add_to_walls_to_remove(self, cur: int, cell: int,
                                direction: Direction) -> None:
         """
-        TODO
+        Registers a specific wall connecting two cells to be destroyed.
+
+        Args:
+            cur (int): The 1D index of the current cell.
+            cell (int): The 1D index of the adjacent cell.
+            direction (Direction): The direction from `cur` to `cell`.
+
+        Returns:
+            None
         """
         match direction:
             case self.Direction.UP:
@@ -233,7 +347,14 @@ class MazeGenerator:
 
     def kruskal_generate_perfect(self) -> None:
         """
-        TODO
+        Generates a perfect maze (no loops, one unique path between any two
+        points) using a randomized Kruskal's algorithm and Disjoint Set Union.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         self._rng.shuffle(self.walls)
         dsu = self.DSU(self.height * self.width)
@@ -248,7 +369,14 @@ class MazeGenerator:
 
     def kruskal_generate_regular(self) -> None:
         """
-        TODO
+        Generates a regular maze (contains loops and multiple paths)
+        using Kruskal's algorithm by randomly omitting some wall bounds.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         self._rng.shuffle(self.walls)
         dsu = self.DSU(self.height * self.width)
@@ -266,11 +394,26 @@ class MazeGenerator:
 
     def dfs_generate_perfect(self) -> None:
         """
-        TODO
+        Generates a perfect maze using a recursive Depth-First Search
+        (Backtracking) algorithm.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         def helper(cur: int, visited: Set[int]) -> None:
             """
-            TODO
+            Recursive helper function traversing unvisited cells to carve
+            paths.
+
+            Args:
+                cur (int): The 1D index of the current cell.
+                visited (Set[int]): A set tracking already processed cells.
+
+            Returns:
+                None
             """
             neighbors = self.get_unvisited_neighbors(cur)
             self._rng.shuffle(neighbors)
@@ -287,9 +430,27 @@ class MazeGenerator:
 
     def dfs_generate_regular(self) -> None:
         """
-        TODO
+        Generates a regular maze (with loops) using DFS by randomly breaking
+        down extra walls post-generation.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         def helper(cur: int, visited: set):
+            """
+            Recursive helper function traversing unvisited cells to carve
+            paths.
+
+            Args:
+                cur (int): The 1D index of the current cell.
+                visited (set): A set tracking already processed cells.
+
+            Returns:
+                None
+            """
             neighbors = self.get_unvisited_neighbors(cur)
             self._rng.shuffle(neighbors)
             for cell, direction in neighbors:
@@ -308,7 +469,15 @@ class MazeGenerator:
 
     def solve_maze(self) -> None:
         """
-        TODO
+        Solves the generated maze finding the absolute shortest path from entry
+        to exit using Dijkstra's algorithm. Populates the `shortest_path`
+        attribute.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         if self.matrix_cells is None:
             return
@@ -320,7 +489,14 @@ class MazeGenerator:
 
         def get_available_neighbor(node: int) -> List[int]:
             """
-            TODO
+            Checks the matrix bounds to find neighbors accessible without
+            walls.
+
+            Args:
+                node (int): The 1D index of the current cell.
+
+            Returns:
+                List[int]: A list of reachable 1D cell indices.
             """
             j = node // width
             i = node % width
@@ -337,7 +513,15 @@ class MazeGenerator:
 
         def dijkstra() -> Union[List[int], None]:
             """
-            TODO
+            Executes Dijkstra's algorithm to navigate through the matrix and
+            backtrack the shortest path.
+
+            Args:
+                None
+
+            Returns:
+                Union[List[int], None]: An ordered list of 1D node indices
+                from entry to exit, or None if no path exists.
             """
             distance = [float('inf')] * (width * height)
             distance[start] = 0
@@ -365,7 +549,15 @@ class MazeGenerator:
 
     def generate_output_file(self) -> None:
         """
-        TODO
+        Parses the cell matrix into a hexadecimal bitmask layout and writes the
+        maze layout, entry/exit coordinates, and path directions to the output
+        file.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         if self.matrix_cells is None or self.shortest_path is None:
             return
@@ -401,7 +593,15 @@ class MazeGenerator:
 
     def generate(self) -> None:
         """
-        TODO
+        The master entry point to generate the maze layout, solve the shortest
+        path, dump data to the output file, and clean up temporary generation
+        memory.
+
+        Args:
+            None
+
+        Returns:
+            None
         """
         if self.algorithm == 'dfs':
             if self.maze_type == 'perfect':
