@@ -10,14 +10,17 @@
 #                                                                           #
 # ************************************************************************* #
 
+"""
+TODO
+"""
 from typing import Any, Dict, List, Union, Tuple
 from .parse_utils import raise_error
 
 
 def validate_concurrency(extracted_data: Dict[str, Any],
-                         mandatory_keys: List[str],
-                         optional_keys: List[str]) -> Tuple[bool, str]:
+                         mandatory_keys: List[str]) -> Tuple[bool, str]:
     """
+    TODO
     """
     # Checks whether all of the mandatory key have a value and if
     # the coordinates at ENTRY are different from the coordinates at EXIT.
@@ -51,14 +54,15 @@ HEIGHT must each be 40 or less.")
 
 def validate_and_format_data(key: str, data: Any) -> Tuple[bool, Any]:
     """
+    TODO
     """
     data_requirements = {
         # This dictionary represents the main data checker. Each entry is
         # composed of a verifier function (Index 0) that verifies if the data
         # passed is valid and a transform function (Index 1) that will
         # transform the data from string to it's attended type.
-        "WIDTH": [lambda v: 20 <= int(v) <= 200, lambda t: int(t)],
-        "HEIGHT": [lambda v: 20 <= int(v) <= 200, lambda t: int(t)],
+        "WIDTH": [lambda v: 20 <= int(v) <= 200, lambda t: map(int, t)],
+        "HEIGHT": [lambda v: 20 <= int(v) <= 200, lambda t: map(int, t)],
         "ENTRY": [lambda v: (parts := v.split(",")) and len(parts) == 2
                   and all(0 <= int(p) for p in parts),
                   lambda t: (int(t.split(',')[0]), int(t.split(',')[1]))],
@@ -68,7 +72,7 @@ def validate_and_format_data(key: str, data: Any) -> Tuple[bool, Any]:
         "OUTPUT_FILE": [lambda v: len(v.strip()) > 0, lambda t: t],
         "PERFECT": [lambda v: v == "True" or v == "False",
                     lambda t: t == "True"],
-        "SEED": [lambda v: 0 <= int(v) <= 200, lambda t: int(t)],
+        "SEED": [lambda v: 0 <= int(v) <= 200, lambda t: map(int, t)],
         "ALGORITHM": [lambda v: v == "Kruskal" or v == "Backtracking",
                       lambda t: t]
     }
@@ -84,8 +88,9 @@ def validate_and_format_data(key: str, data: Any) -> Tuple[bool, Any]:
 
 
 def validate_and_extract_config(cf_data: List[str]) -> Union[Dict[str, Any],
-                                                             None]:
+                                                             int]:
     """
+    TODO
     """
     mandatory_keys = ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE",
                       "PERFECT"]
@@ -139,15 +144,15 @@ rule linked to {key}: {validation_conditions[f'{key}']}""")
 
     # After validating and transforming every data, this function checks
     # whether the different parameters are bounded and not overlaping.
-    data_bounded = validate_concurrency(extracted_data, mandatory_keys,
-                                        optional_keys)
+    data_bounded = validate_concurrency(extracted_data, mandatory_keys)
     if not data_bounded[0]:
         return raise_error("BOUND ERROR", data_bounded[1])
     return extracted_data
 
 
-def parse_config(argc: int, argv: List[Any]) -> Union[Dict[str, Any], None]:
+def parse_config(argc: int, argv: List[Any]) -> Union[Dict[str, Any], int]:
     """
+    TODO
     """
     if argc != 2:
         return raise_error("ARGUMENTS ERROR", """The arguments provided to \
@@ -160,7 +165,7 @@ $> python3 a_maze_ing.py '<file name>'""")
     config_file = argv[1]
     try:
         # 'cf' represents 'Config File'.
-        with open(config_file) as cf:
+        with open(config_file, 'r', encoding="utf-8") as cf:
             # This applies .strip() on all of the lines of the file. This
             # will remove white spaces on the left and right of each string.
             stripped_cf_data = list(map(lambda ln: ln.strip(),

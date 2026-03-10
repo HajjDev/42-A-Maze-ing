@@ -1,26 +1,18 @@
-#!/usr/bin/env python3
-
 # ************************************************************************* #
 #                                                                           #
 #                                                      :::      ::::::::    #
-#  a_maze_ing.py                                     :+:      :+:    :+:    #
+#  parse_utils.py                                    :+:      :+:    :+:    #
 #                                                  +:+ +:+         +:+      #
 #  By: cel-hajj <cel-hajj@student.s19.be>        +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
-#  Created: 2026/03/02 07:38:57 by cel-hajj        #+#    #+#               #
-#  Updated: 2026/03/02 08:38:05 by cel-hajj        ###   ########.fr        #
+#  Created: 2026/03/02 10:06:46 by cel-hajj        #+#    #+#               #
+#  Updated: 2026/03/02 10:08:45 by cel-hajj        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
-import sys
-from parsing.parse_config import parse_config
-
-
-def a_maze_ing() -> None:
-    config_data = parse_config(len(sys.argv), sys.argv)
-    if config_data is not None:
-        print(config_data)
-
-
-if __name__ == "__main__":
-    a_maze_ing()
+def raise_error(error_type: str, msg: str) -> int:
+    """
+    TODO
+    """
+    print(f"[{error_type}]: {msg}")
+    return -1
