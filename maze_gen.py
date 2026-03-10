@@ -208,7 +208,6 @@ class Kruskal_Maze:
                         heapq.heappush(pq, (dist, neighbor))
             return None
 
-
         self.shortest_path = dijkstra()
 
 
@@ -480,10 +479,6 @@ class DFS_Maze:
                     hex_seq = ""
                     for x in range(self.width) :
                         val = mat[y][x][0] + mat[y][x][1] * 2 + mat[y][x][2] * 4 + mat[y][x][3] * 8
-                        # if val  == 15:
-                        #     hex_seq += " "
-                        # else:
-                        #     hex_seq += f"{val:X}"
                         hex_seq += f"{val:X}"
                     hex_seq+="\n"
                     file.write(hex_seq)

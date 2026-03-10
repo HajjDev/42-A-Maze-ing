@@ -9,8 +9,21 @@ class MazeDisplay:
         self.width = self.maze.width
         self.height = self.maze.height
 
-        self.win_w = 1024
-        self.win_h = 768
+        self.mlx_wrap = Mlx()
+        self.mlx_ptr = self.mlx_wrap.mlx_init()
+
+        screen_width, screen_height = self.mlx_wrap.mlx_get_screen_size(self.mlx_ptr)[1:]
+
+        max_win_w = int(screen_width * 0.95)
+        max_win_h = int(screen_height * 0.95)
+
+        tile_w = max_win_w // maze.width
+        tile_h = max_win_h // maze.height
+
+        self.tile_size = max(2, min(tile_w, tile_h, 32))
+
+        self.win_w = max(800, maze.width * self.tile_size)
+        self.win_h = maze.height * self.tile_size
         
         self.ui_height = 60
         self.margin = 40
@@ -24,8 +37,6 @@ class MazeDisplay:
         self.offset_x = self.margin + (usable_w - (self.width * self.cell_size)) // 2
         self.offset_y = self.ui_height + self.margin + (usable_h - (self.height * self.cell_size)) // 2
 
-        self.mlx_wrap = Mlx()
-        self.mlx_ptr = self.mlx_wrap.mlx_init()
         self.win_ptr = self.mlx_wrap.mlx_new_window(self.mlx_ptr, self.win_w, self.win_h, "A-Maze-ing - Clean PRO")
         
         self.img_ptr = self.mlx_wrap.mlx_new_image(self.mlx_ptr, self.win_w, self.win_h)
@@ -36,9 +47,15 @@ class MazeDisplay:
         self.theme_idx = 0
         
         self.themes = [
-            (0x3C3C3C, 0x1E1E1E, 0x007ACC), 
-            (0x75715E, 0x272822, 0xA6E22E), 
-            (0x504945, 0x282828, 0xFB4934)  
+            (0x3C3C3C, 0x1E1E1E, 0x007ACC),
+            (0x75715E, 0x272822, 0xA6E22E),
+            (0x504945, 0x282828, 0xFB4934),
+            (0x44475A, 0x282A36, 0xFF79C6),
+            (0x3B4252, 0x2E3440, 0x88C0D0),
+            (0x5C6370, 0x282C34, 0xE06C75),
+            (0xA9B1D6, 0x1A1B26, 0x7AA2F7),
+            (0x585858, 0x161616, 0x42BE65),
+            (0xC0C0C0, 0x0D0D0D, 0xFF6600),
         ]
 
         self.c_entry = 0x10B981   
@@ -60,10 +77,17 @@ class MazeDisplay:
             if self.bytes_per_pixel == 4:
                 self.img_data[index + 3] = 255 
 
+    # def draw_rect(self, start_x, start_y, w, h, color):
+    #     for y in range(start_y, start_y + h):
+    #         for x in range(start_x, start_x + w):
+    #             self.fast_put_pixel(x, y, color)
+
     def draw_rect(self, start_x, start_y, w, h, color):
+        b = bytes([color & 0xFF, (color>>8)&0xFF, (color>>16)&0xFF, 0xFF])
+        row = b * w
         for y in range(start_y, start_y + h):
-            for x in range(start_x, start_x + w):
-                self.fast_put_pixel(x, y, color)
+            idx = y * self.size_line + start_x * self.bytes_per_pixel
+            self.img_data[idx:idx + len(row)] = row
     
     def setup_hooks(self):
         self.mlx_wrap.mlx_hook(self.win_ptr, 17, 0, self.close_window, self)
@@ -86,7 +110,7 @@ class MazeDisplay:
         y_text = 35 
         c_text = 0xCCCCCC 
         
-        theme_names = ["VS Code", "Monokai", "Gruvbox"]
+        theme_names = ["VS Code", "Monokai", "Gruvbox", "Dracula", "Nord", "One Dark", "Tokyo Night", "Carbon", "Matrix"]
         
         self.mlx_wrap.mlx_string_put(self.mlx_ptr, self.win_ptr, 30, y_text, c_text, "[R] Regenerate")
         self.mlx_wrap.mlx_string_put(self.mlx_ptr, self.win_ptr, 200, y_text, c_text, "[C] Theme")
@@ -149,8 +173,7 @@ class MazeDisplay:
         if keycode in [53, 65307]:
             self.close_window()
         elif keycode in [15, 114]:
-            self.maze.generate_perfect()
-            self.maze.solve_maze()
+            self.maze.generate()
             self.render_maze()
         elif keycode in [8, 99]:
             self.theme_idx = (self.theme_idx + 1) % len(self.themes)
@@ -158,21 +181,21 @@ class MazeDisplay:
         elif keycode in [35, 112]:
             self.show_path = not self.show_path
             self.render_maze()
-    
+
     def run(self):
         self.setup_hooks()
         print("[+] MLX Engine started. Window running.")
         self.mlx_wrap.mlx_loop(self.mlx_ptr)
 
 if __name__ == "__main__":
-    from maze_gen import Kruskal_Maze
+    from maze_generator import MazeGenerator
     sys.setrecursionlimit(30000)
-    
-    maze_size = 20
-    maze = Kruskal_Maze(maze_size, maze_size, entry_point=(0, 1), exit_point=(maze_size-1, maze_size-1))
-    
-    maze.generate_regular()
-    maze.solve_maze()
+
+    width = 9 # min width
+    height = 7 #min height
+    maze = MazeGenerator(9, 7, entry_point=(0, 0), exit_point=(height-1, height-1), algorithm='dfs', maze_type='perfect')
+
+    maze.generate()
 
     ui = MazeDisplay(maze)
     ui.run()
