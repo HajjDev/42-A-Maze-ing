@@ -33,7 +33,7 @@ def a_maze_ing() -> None:
         None: This function does not return a value.
     """
     config_data = parse_config(len(sys.argv), sys.argv)
-    if config_data != -1:
+    if isinstance(config_data, dict):
         maze = MazeGenerator(width=config_data["WIDTH"],
                              height=config_data["HEIGHT"],
                              seed=config_data["SEED"],

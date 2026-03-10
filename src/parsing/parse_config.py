@@ -119,13 +119,13 @@ def validate_and_format_data(key: str, data: Any) -> Tuple[bool, Any]:
         (True/False), and the second element is the casted/formatted data
         (or None on failure).
     """
-    data_requirements = {
+    data_requirements: Dict[str, List[Any]] = {
         # This dictionary represents the main data checker. Each entry is
         # composed of a verifier function (Index 0) that verifies if the data
         # passed is valid and a transform function (Index 1) that will
         # transform the data from string to it's attended type.
-        "WIDTH": [lambda v: 9 <= int(v) <= 200, lambda t: map(int, t)],
-        "HEIGHT": [lambda v: 7 <= int(v) <= 200, lambda t: map(int, t)],
+        "WIDTH": [lambda v: 9 <= int(v) <= 200, lambda t: int("".join(t))],
+        "HEIGHT": [lambda v: 7 <= int(v) <= 200, lambda t: int("".join(t))],
         "ENTRY": [lambda v: (parts := v.split(",")) and len(parts) == 2
                   and all(0 <= int(p) for p in parts),
                   lambda t: (int(t.split(',')[0]), int(t.split(',')[1]))],
@@ -135,7 +135,7 @@ def validate_and_format_data(key: str, data: Any) -> Tuple[bool, Any]:
         "OUTPUT_FILE": [lambda v: len(v.strip()) > 0, lambda t: t],
         "PERFECT": [lambda v: v == "True" or v == "False",
                     lambda t: t == "True"],
-        "SEED": [lambda v: 0 <= int(v) <= 200, lambda t: map(int, t)],
+        "SEED": [lambda v: 0 <= int(v) <= 200, lambda t: int("".join(t))],
         "ALGORITHM": [lambda v: v == "Kruskal" or v == "Backtracking",
                       lambda t: t]
     }
