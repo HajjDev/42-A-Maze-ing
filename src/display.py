@@ -6,14 +6,14 @@
 #  By: cel-hajj <cel-hajj@student.s19.be>        +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/03/10 23:49:26 by cel-hajj        #+#    #+#               #
-#  Updated: 2026/03/10 23:49:34 by cel-hajj        ###   ########.fr        #
+#  Updated: 2026/03/11 16:41:17 by cel-hajj        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
 """
 Handles the graphical display and user interaction for the Maze Generator.
 """
-import sys
+import os
 import time
 from typing import Any
 from mlx import Mlx
@@ -192,7 +192,7 @@ class MazeDisplay:
         self.mlx_wrap.mlx_loop_exit(self.mlx_ptr)
         self.mlx_wrap.mlx_destroy_image(self.mlx_ptr, self.img_ptr)
         self.mlx_wrap.mlx_destroy_window(self.mlx_ptr, self.win_ptr)
-        sys.exit(0)
+        os.exit(0)
 
     def draw_ui_text(self) -> None:
         """
