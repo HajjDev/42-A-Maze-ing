@@ -1,3 +1,9 @@
 venv
 env
 /home/asaph/42_school/A-Maze-Ing/mlx/libmlx.so
+
+*.pyc
+*.pyd
+*.pyo
+
+__pycache__/

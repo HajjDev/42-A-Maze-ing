@@ -439,7 +439,7 @@ class MazeGenerator:
         Returns:
             None
         """
-        def helper(cur: int, visited: set):
+        def helper(cur: int, visited: Set[int]) -> None:
             """
             Recursive helper function traversing unvisited cells to carve
             paths.
@@ -610,7 +610,7 @@ class MazeGenerator:
                 self.dfs_generate_regular()
             self.dfs_fill_matrix_cells()
         else:
-            if self.maze_type == 'prefect':
+            if self.maze_type == 'perfect':
                 self.kruskal_generate_perfect()
             else:
                 self.kruskal_generate_regular()

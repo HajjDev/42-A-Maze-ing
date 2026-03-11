@@ -18,9 +18,9 @@ configuration file, initializing the maze generation engine, and launching
 the graphical display loop.
 """
 import sys
-from parsing.parse_config import parse_config
-from maze_generator import MazeGenerator
-from display import MazeDisplay
+from src.parsing.parse_config import parse_config
+from src.maze_generator import MazeGenerator
+from src.display import MazeDisplay
 
 
 def a_maze_ing() -> None:
@@ -41,7 +41,8 @@ def a_maze_ing() -> None:
                              entry_point=config_data["ENTRY"],
                              exit_point=config_data["EXIT"],
                              algorithm=config_data["ALGORITHM"],
-                             maze_type=config_data["PERFECT"],
+                             maze_type=("perfect" if config_data["PERFECT"]
+                             else "regular"),
                              output_filename=config_data["OUTPUT_FILE"])
 
         display = MazeDisplay(maze)

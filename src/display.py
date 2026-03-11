@@ -15,8 +15,9 @@ Handles the graphical display and user interaction for the Maze Generator.
 """
 import sys
 import time
+from typing import Any
 from mlx import Mlx
-from maze_generator import MazeGenerator
+from src.maze_generator import MazeGenerator
 
 
 class MazeDisplay:
@@ -169,7 +170,7 @@ class MazeDisplay:
         self.mlx_wrap.mlx_hook(self.win_ptr, 2, 1, self.key_press, self)
         self.mlx_wrap.mlx_hook(self.win_ptr, 12, 0, self.expose_event, self)
 
-    def expose_event(self, *_args) -> None:
+    def expose_event(self, *_args: Any) -> None:
         """
         Handles the window expose event to ensure the maze renders correctly.
 
@@ -180,7 +181,7 @@ class MazeDisplay:
             self.render_maze()
             self.is_drawn = True
 
-    def close_window(self, *_args) -> None:
+    def close_window(self, *_args: Any) -> None:
         """
         Terminates the MLX loop, destroys memory pointers, and exits the
         program.
@@ -283,7 +284,7 @@ class MazeDisplay:
                                               self.img_ptr, 0, 0)
         self.draw_ui_text()
 
-    def key_press(self, keycode: int, *_args) -> None:
+    def key_press(self, keycode: int, *_args: Any) -> None:
         """
         Handles keyboard inputs to trigger interface actions with an anti-spam
         cooldown.
