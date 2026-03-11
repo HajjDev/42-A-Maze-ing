@@ -192,7 +192,7 @@ class MazeDisplay:
         self.mlx_wrap.mlx_loop_exit(self.mlx_ptr)
         self.mlx_wrap.mlx_destroy_image(self.mlx_ptr, self.img_ptr)
         self.mlx_wrap.mlx_destroy_window(self.mlx_ptr, self.win_ptr)
-        os.exit(0)
+        os._exit(0)
 
     def draw_ui_text(self) -> None:
         """
@@ -268,17 +268,38 @@ class MazeDisplay:
                     if cell[3] == 1:
                         self.draw_rect(px, py, wall_thick, self.cell_size,
                                        c_wall)
-
         if self.show_path and self.maze.shortest_path:
-            path_size = max(2, self.cell_size // 3)
-            path_offset = (self.cell_size - path_size) // 2
+            path_w = max(2, self.cell_size // 4)
+            half = path_w // 2
 
-            for node_1d in self.maze.shortest_path:
-                px = (self.offset_x + ((node_1d % self.width) * self.cell_size)
-                      + path_offset)
-                py = (self.offset_y + ((node_1d // self.width) *
-                                       self.cell_size) + path_offset)
-                self.draw_rect(px, py, path_size, path_size, c_path)
+            for i in range(len(self.maze.shortest_path) - 1):
+                n1 = self.maze.shortest_path[i]
+                n2 = self.maze.shortest_path[i + 1]
+
+                # Centre des deux cellules consécutives
+                cx1 = (
+                    self.offset_x + (n1 % self.width) *
+                    self.cell_size + self.cell_size // 2
+                )
+                cy1 = (
+                    self.offset_y + (n1 // self.width) *
+                    self.cell_size + self.cell_size // 2
+                )
+                cx2 = (
+                    self.offset_x + (n2 % self.width) *
+                    self.cell_size + self.cell_size // 2
+                )
+                cy2 = (
+                    self.offset_y + (n2 // self.width) *
+                    self.cell_size + self.cell_size // 2
+                )
+
+                # Segment horizontal ou vertical entre les deux centres
+                x = min(cx1, cx2) - half
+                y = min(cy1, cy2) - half
+                w = abs(cx2 - cx1) + path_w
+                h = abs(cy2 - cy1) + path_w
+                self.draw_rect(x, y, w, h, c_path)
 
         self.mlx_wrap.mlx_put_image_to_window(self.mlx_ptr, self.win_ptr,
                                               self.img_ptr, 0, 0)

@@ -32,6 +32,7 @@ def a_maze_ing() -> None:
     Returns:
         None: This function does not return a value.
     """
+    sys.setrecursionlimit(40000)
     config_data = parse_config(len(sys.argv), sys.argv)
     if isinstance(config_data, dict):
         maze = MazeGenerator(width=config_data["WIDTH"],

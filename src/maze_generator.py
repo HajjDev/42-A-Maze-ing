@@ -291,7 +291,7 @@ class MazeGenerator:
                     mat[y1][x1][2] = 1
                     mat[y2][x2][0] = 1
 
-    def get_unvisited_neighbors(self, cur: int) -> List[Tuple[int, Any]]:
+    def get_neighbors(self, cur: int) -> List[Tuple[int, Any]]:
         """
         Retrieves valid grid neighbors for a cell that are within maze
         boundaries.
@@ -415,7 +415,7 @@ class MazeGenerator:
             Returns:
                 None
             """
-            neighbors = self.get_unvisited_neighbors(cur)
+            neighbors = self.get_neighbors(cur)
             self._rng.shuffle(neighbors)
             for cell, direction in neighbors:
                 if cell not in visited:
@@ -439,30 +439,7 @@ class MazeGenerator:
         Returns:
             None
         """
-        def helper(cur: int, visited: Set[int]) -> None:
-            """
-            Recursive helper function traversing unvisited cells to carve
-            paths.
-
-            Args:
-                cur (int): The 1D index of the current cell.
-                visited (set): A set tracking already processed cells.
-
-            Returns:
-                None
-            """
-            neighbors = self.get_unvisited_neighbors(cur)
-            self._rng.shuffle(neighbors)
-            for cell, direction in neighbors:
-                if cell not in visited:
-                    self.add_to_walls_to_remove(cur, cell, direction)
-                    visited.add(cell)
-                    helper(cell, visited)
-        start = self.entry_point[1] * self.width + self.entry_point[0]
-        visited = set()
-        for cell in self.pattern_cells:
-            visited.add(cell)
-        helper(start, visited)
+        self.dfs_generate_regular()
         for wall in self.walls:
             if wall not in self.walls_to_remove and self._rng.random() < 0.05:
                 self.walls_to_remove.add(wall)

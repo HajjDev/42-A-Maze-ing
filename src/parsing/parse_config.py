@@ -93,14 +93,6 @@ respectively.")
     if extracted_data["EXIT"] in pattern_coords:
         return (False, "The EXIT coordinates cannot be spawned inside the \
 '42' pattern walls.")
-
-    # Imposes bounds if the user chooses the Backtracking algorithm to avoid
-    # maximum recursion depth.
-    if (extracted_data["ALGORITHM"] == "Backtracking" and
-            (extracted_data["WIDTH"] > 40 or extracted_data["HEIGHT"] > 40)):
-        return (False, "The Backtracking algorithm has been selected, but the \
-grid size is too large. To prevent maximum recursion depth errors, WIDTH and \
-HEIGHT must each be 40 or less.")
     return (True, "")
 
 
