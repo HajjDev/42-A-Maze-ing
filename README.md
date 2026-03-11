@@ -1,5 +1,7 @@
 *This project has been created as part of the 42 curriculum by cel-hajj, anzongan.*
 
+![Sample output](.github/images/sample_output.png)
+
 # A-Maze-ing 🧭
 
 ## 📖 Description
