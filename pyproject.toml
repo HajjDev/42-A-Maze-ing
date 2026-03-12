@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a_maze_ing"
+description = "A maze generator, and printer"
+readme = "README.md"
+version = "0.1.0"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+a-maze-ing = "a_maze_ing.main:main"
+
+[project.urls]
+Homepage = "https://github.com/HajjDev/42-A-Maze-ing/"
+Issues = "https://github.com/HajjDev/42-A-Maze-ing/issues"

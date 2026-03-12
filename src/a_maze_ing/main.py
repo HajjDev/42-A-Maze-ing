@@ -18,12 +18,12 @@ configuration file, initializing the maze generation engine, and launching
 the graphical display loop.
 """
 import sys
-from src.parsing.parse_config import parse_config
-from src.maze_generator import MazeGenerator
-from src.display import MazeDisplay
+from parsing.parse_config import parse_config
+from maze_generator import MazeGenerator
+from display import MazeDisplay
 
 
-def a_maze_ing() -> None:
+def main() -> None:
     """
     Executes the main routine of the application. Extracts data from the
     configuration file via command-line arguments, instantiates the maze,
@@ -52,4 +52,4 @@ def a_maze_ing() -> None:
 
 
 if __name__ == "__main__":
-    a_maze_ing()
+    main()

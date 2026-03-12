@@ -4,6 +4,7 @@ PIP = $(VENV_DIR)/bin/pip
 PDB = $(VENV_DIR)/bin/python3 -m pdb
 FLAKE8 = $(VENV_DIR)/bin/flake8
 MYPY = $(VENV_DIR)/bin/mypy
+PREFIX = src/a_maze_ing
 
 MLX_WHEEL = mlx-2.2-py3-none-any.whl
 
@@ -11,12 +12,12 @@ MLX_WHEEL = mlx-2.2-py3-none-any.whl
 FILE ?= config.txt
 
 
-PY_FILES = a_maze_ing.py \
-           src/display.py \
-           src/maze_generator.py \
-           src/parsing/__init__.py \
-           src/parsing/parse_config.py \
-           src/parsing/parse_utils.py
+PY_FILES = $(PREFIX)/main.py \
+           $(PREFIX)/display.py \
+           $(PREFIX)/maze_generator.py \
+           $(PREFIX)/parsing/__init__.py \
+           $(PREFIX)/parsing/parse_config.py \
+           $(PREFIX)/parsing/parse_utils.py
 
 
 all: install
@@ -31,10 +32,10 @@ $(VENV_DIR)/bin/activate:
 	touch $(VENV_DIR)/bin/activate
 
 run: install
-	$(PYTHON) a_maze_ing.py $(FILE)
+	$(PYTHON) $(PREFIX)/main.py $(FILE)
 
 debug: install
-	$(PDB) a_maze_ing.py $(FILE)
+	$(PDB) $(PREFIX)/main.py $(FILE)
 
 lint: install
 	$(FLAKE8) $(PY_FILES)
@@ -42,7 +43,10 @@ lint: install
 
 lint-strict: install
 	$(FLAKE8) $(PY_FILES)
-	$(MYPY) $(PY_FILES) --strict
+	$(MYPY)TellUs: A MERN-Stack Social Media Platform $(PY_FILES) --strict
+
+clean: 
+	rm -rf $(PREFIX)/__pycache__ $(PREFIX)/parsing/__pycache__
 
 fclean: clean
 	rm -rf $(VENV_DIR)
