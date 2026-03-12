@@ -2,12 +2,15 @@ Metadata-Version: 2.4
 Name: a_maze_ing
 Version: 0.1.0
 Summary: A maze generator, and printer
+License-Expression: MIT
 Project-URL: Homepage, https://github.com/HajjDev/42-A-Maze-ing/
 Project-URL: Issues, https://github.com/HajjDev/42-A-Maze-ing/issues
 Classifier: Programming Language :: Python :: 3
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Dynamic: license-file
 
 *This project has been created as part of the 42 curriculum by cel-hajj, anzongan.*
 
