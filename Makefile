@@ -41,10 +41,6 @@ lint: install
 	$(FLAKE8) $(PY_FILES)
 	$(MYPY) $(PY_FILES) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
-lint-strict: install
-	$(FLAKE8) $(PY_FILES)
-	$(MYPY)TellUs: A MERN-Stack Social Media Platform $(PY_FILES) --strict
-
 clean: 
 	rm -rf $(PREFIX)/__pycache__ $(PREFIX)/parsing/__pycache__
 
