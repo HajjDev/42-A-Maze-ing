@@ -27,8 +27,7 @@ install: $(VENV_DIR)/bin/activate
 $(VENV_DIR)/bin/activate:
 	python3 -m venv $(VENV_DIR)
 	$(PIP) install --upgrade pip
-	$(PIP) install $(MLX_WHEEL)
-	$(PIP) install flake8 mypy
+	$(PIP) install -r requirements.txt
 	touch $(VENV_DIR)/bin/activate
 
 run: install
@@ -41,8 +40,9 @@ lint: install
 	$(FLAKE8) $(PY_FILES)
 	$(MYPY) $(PY_FILES) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
-clean: 
-	rm -rf $(PREFIX)/__pycache__ $(PREFIX)/parsing/__pycache__
+clean:
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	rm -rf .mypy_cache
 
 fclean: clean
 	rm -rf $(VENV_DIR)
