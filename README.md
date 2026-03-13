@@ -66,7 +66,7 @@ make clean    # Removes Python cache and temporary files
 
 ### Manual Execution
 ```bash
-python3 a_maze_ing.py config.txt
+PYTHONPATH=src python3 main.py config.txt
 ```
 
 **UI Controls:**
@@ -101,7 +101,7 @@ pip install mazegen-1.0.0-py3-none-any.whl
 
 ### Reusability Example
 ```python
-from maze_generator import MazeGenerator
+from mazegen.maze_generator import MazeGenerator
 
 # Instantiate a 20x20 perfect maze using Kruskal
 maze = MazeGenerator(width=20, height=20, seed=42, cell_size=32,

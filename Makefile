@@ -4,7 +4,7 @@ PIP = $(VENV_DIR)/bin/pip
 PDB = $(VENV_DIR)/bin/python3 -m pdb
 FLAKE8 = $(VENV_DIR)/bin/flake8
 MYPY = $(VENV_DIR)/bin/mypy
-PREFIX = src/a_maze_ing
+PREFIX = src/mazegen
 
 MLX_WHEEL = mlx-2.2-py3-none-any.whl
 
@@ -12,7 +12,7 @@ MLX_WHEEL = mlx-2.2-py3-none-any.whl
 FILE ?= config.txt
 
 
-PY_FILES = $(PREFIX)/main.py \
+PY_FILES = main.py \
            $(PREFIX)/display.py \
            $(PREFIX)/maze_generator.py \
            $(PREFIX)/parsing/__init__.py \
@@ -32,10 +32,10 @@ $(VENV_DIR)/bin/activate:
 	touch $(VENV_DIR)/bin/activate
 
 run: install
-	$(PYTHON) $(PREFIX)/main.py $(FILE)
+	PYTHONPATH=src $(PYTHON) main.py config.txt
 
 debug: install
-	$(PDB) $(PREFIX)/main.py $(FILE)
+	$(PDB) main.py $(FILE)
 
 lint: install
 	$(FLAKE8) $(PY_FILES)

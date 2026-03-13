@@ -16,11 +16,28 @@
 Main entry point for the A-Maze-ing application. It coordinates parsing the
 configuration file, initializing the maze generation engine, and launching
 the graphical display loop.
+
+Running Instruction:
+
+To run this script, you have three options:
+
+1. Install the dependencies and run the script:
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt;
+python3 main.py config.txt
+
+2. Use the rule provided in the Makefile:
+make run
+
+3. Run using the local source library:
+PYTHONPATH=src python3 main.py config.txt
+
 """
 import sys
-from parsing.parse_config import parse_config
-from maze_generator import MazeGenerator
-from display import MazeDisplay
+from mazegen.parsing.parse_config import parse_config
+from mazegen.maze_generator import MazeGenerator
+from mazegen.display import MazeDisplay
 
 
 def main() -> None:
@@ -45,9 +62,8 @@ def main() -> None:
                              maze_type=("perfect" if config_data["PERFECT"]
                              else "regular"),
                              output_filename=config_data["OUTPUT_FILE"])
-
-        display = MazeDisplay(maze)
         maze.generate()
+        display = MazeDisplay(maze)
         display.run()
 
 
