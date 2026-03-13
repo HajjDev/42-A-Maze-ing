@@ -24,20 +24,24 @@ To run this script, you have three options:
 1. Install the dependencies and run the script:
 python3 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt;
+pip install -r requirements.txt
+pip install mazegen-1.0.0-py3-none-any.whl
 python3 main.py config.txt
 
 2. Use the rule provided in the Makefile:
 make run
 
 3. Run using the local source library:
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt;
 PYTHONPATH=src python3 main.py config.txt
 
 """
 import sys
-from mazegen.parsing.parse_config import parse_config
+from parsing.parse_config import parse_config
 from mazegen.maze_generator import MazeGenerator
-from mazegen.display import MazeDisplay
+from display import MazeDisplay
 
 
 def main() -> None:

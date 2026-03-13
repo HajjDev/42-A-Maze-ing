@@ -17,7 +17,7 @@ import os
 import time
 from typing import Any
 from mlx import Mlx
-from .maze_generator import MazeGenerator
+from mazegen.maze_generator import MazeGenerator
 
 
 class MazeDisplay:
